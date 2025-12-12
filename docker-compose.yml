@@ -1,0 +1,55 @@
+version: '3.8'
+
+services: 
+  #backend (Laravel)
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    image: nativo-backend
+    container_name: app_backend
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - nativo-network
+    depends_on:
+      - db
+  #base de datos (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: app_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - nativo-network
+  #frontend (vue)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: nativo-frontend
+    container_name: app_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173" 
+    networks:
+      - nativo-network
+
+networks:
+  nativo-network:
+    driver: bridge
+
+volumes:
+  dbdata:
