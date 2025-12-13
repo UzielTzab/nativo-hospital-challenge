@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Patient;
 
 class PatientController extends Controller
 {
@@ -12,6 +13,11 @@ class PatientController extends Controller
     public function index()
     {
         $patients = Patient::with(['hospital', 'tutor'])->get();
+
+        if ($patients->isEmpty()) {
+            return response()->json(['message' => 'No hay pacientes registrados'], 404);
+        }
+
         return response()->json($patients);
     }
 
@@ -46,6 +52,11 @@ class PatientController extends Controller
     public function show(string $id)
     {
         $patient = Patient::with(['hospital', 'tutor'])->findOrFail($id);
+        
+        if (!$patient) {
+            return response()->json(['message' => 'Paciente no encontrado'], 404);
+        }
+
         return response()->json($patient);
     }
 
