@@ -47,6 +47,9 @@ services:
       - "5173:5173" 
     networks:
       - nativo-network
+    command: npm run dev
+    environment:
+    - VITE_HOST=0.0.0.0
 
 networks:
   nativo-network:
