@@ -11,7 +11,11 @@ services:
     restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - ./backend:/var/www
+      - ./backend:/var/www:delegated
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - LOG_CHANNEL=single
     command: php artisan serve --host=0.0.0.0 --port=8000
     ports:
       - "8001:8000"
@@ -27,6 +31,7 @@ services:
     environment:
       MYSQL_DATABASE: laravel
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_INITDB_SKIP_TZINFO: "yes"
     volumes:
       - dbdata:/var/lib/mysql
     ports:
@@ -41,7 +46,7 @@ services:
     image: nativo-frontend
     container_name: app_frontend
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app:delegated
       - /app/node_modules
     ports:
       - "5173:5173" 

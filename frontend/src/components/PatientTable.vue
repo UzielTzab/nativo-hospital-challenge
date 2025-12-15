@@ -15,6 +15,7 @@ const props = defineProps({
 const emit = defineEmits(['close-modal', 'edit']);
 const patients = ref([]);
 const loading = ref(true);
+const isDeleting = ref(false);
 const searchTerm = ref('');
 const filterSexo = ref('all');
 const deletePatientId = ref(null);
@@ -42,9 +43,8 @@ const calculateAgeForPatient = (birthDate) => {
   return calculateAge(birthDate);
 };
 
-const handleDownloadPatientData = (id)=>
-{
-    alert(`Descargando datos del paciente con ID: ${id}`);
+const handleDownloadPatientData = (id) => {
+  alert(`Descargando datos del paciente con ID: ${id}`);
 };
 
 
@@ -53,6 +53,7 @@ const fetchPatients = async () => {
     loading.value = true;
     const response = await PatientService.getPatients();
     patients.value = response.data;
+    console.log('Pacientes cargados:', patients.value.length);
   } catch (error) {
     console.error('Error al cargar pacientes:', error);
   } finally {
@@ -62,6 +63,7 @@ const fetchPatients = async () => {
 
 const handleCloseModal = () => {
   showFormModal.value = false;
+  editingPatient.value = null;
   emit('close-modal');
 };
 
@@ -73,7 +75,9 @@ const handleFormSubmit = async (formData) => {
       await PatientService.createPatient(formData);
     }
     await fetchPatients();
-    handleCloseModal();
+    setTimeout(() => {
+      handleCloseModal();
+    }, 500);
   } catch (error) {
     console.error('Error al guardar paciente:', error);
   }
@@ -86,8 +90,10 @@ const handleEditPatient = (patient) => {
 
 const handleDelete = async (patientId) => {
   try {
+    isDeleting.value = true;
     await PatientService.deletePatient(patientId);
     await fetchPatients();
+    isDeleting.value = false;
     deletePatientId.value = null;
   } catch (error) {
     console.error('Error al eliminar paciente:', error);
@@ -101,12 +107,8 @@ onMounted(() => {
 
 <template>
   <div>
-    <ModalFormPatient
-      :open="showFormModal"
-      :patient="editingPatient"
-      @close="handleCloseModal"
-      @submit="handleFormSubmit"
-    />
+    <ModalFormPatient :open="showFormModal" :patient="editingPatient" @close="handleCloseModal"
+      @submit="handleFormSubmit" />
     <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
       <div class="space-y-6">
         <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -117,20 +119,15 @@ onMounted(() => {
           <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <div class="relative flex-1 sm:w-64">
               <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                v-model="searchTerm"
-                type="text"
-                placeholder="Buscar pacientes..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <input v-model="searchTerm" type="text" placeholder="Buscar pacientes..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
             </div>
 
             <div class="relative w-full sm:w-40">
-              <Filter class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-              <select
-                v-model="filterSexo"
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white cursor-pointer"
-              >
+              <Filter
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+              <select v-model="filterSexo"
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white cursor-pointer">
                 <option value="all">Todos</option>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
@@ -186,7 +183,8 @@ onMounted(() => {
                     {{ calculateAgeForPatient(patient.birth_date) }} años
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap">
-                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-xl bg-blue-100 text-blue-900">
+                    <span
+                      class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-xl bg-blue-100 text-blue-900">
                       {{ patient.sex === 'M' ? 'Masculino' : 'Femenino' }}
                     </span>
                   </td>
@@ -200,25 +198,19 @@ onMounted(() => {
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center gap-2">
-                      <button
-                        @click="handleEditPatient(patient)"
-                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                      >
+                      <button @click="handleEditPatient(patient)"
+                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
                         <Edit class="h-4 w-4 text-blue-600" />
                       </button>
-                      <button
-                        @click="handleDownloadPatientData(patient.id)"
-                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-200 rounded-lg transition-colors"
-                      >
+                      <button @click="handleDownloadPatientData(patient.id)"
+                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-200 rounded-lg transition-colors">
                         <FileDown class="h-4 w-4 text-blue-600" />
                       </button>
-                      <button
-                        @click="deletePatientId = patient.id"
-                        class="h-8 w-8 inline-flex bg-red-100 items-center justify-center text-red-600 hover:bg-red-200 rounded-lg transition-colors"
-                      >
+                      <button @click="deletePatientId = patient.id"
+                        class="h-8 w-8 inline-flex bg-red-100 items-center justify-center text-red-600 hover:bg-red-200 rounded-lg transition-colors">
                         <Trash2 class="h-4 w-4 text-red-600" />
                       </button>
-                     
+
                     </div>
                   </td>
                 </tr>
@@ -240,17 +232,15 @@ onMounted(() => {
           </p>
         </main>
         <footer class="flex gap-3 justify-end">
-          <button
-            @click="deletePatientId = null"
-            class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-          >
+          <button @click="deletePatientId = null"
+            class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
             Cancelar
           </button>
-          <button
-            @click="handleDelete(deletePatientId)"
-            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-          >
-            Eliminar
+          <button @click="handleDelete(deletePatientId)"
+            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isDeleting">
+            <LoaderCircle v-if="isDeleting" class="h-5 w-5 text-white animate-spin" />
+            <span>{{ isDeleting ? 'Eliminando...' : 'Eliminar' }}</span>
           </button>
         </footer>
       </div>
