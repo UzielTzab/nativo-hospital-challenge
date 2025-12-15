@@ -21,6 +21,7 @@ const filterSexo = ref('all');
 const deletePatientId = ref(null);
 const showFormModal = ref(false);
 const editingPatient = ref(null);
+const modalRef = ref(null);
 
 watch(() => props.showModal, (newValue) => {
   showFormModal.value = newValue;
@@ -50,7 +51,6 @@ const handleDownloadPatientData = (id) => {
 
 const fetchPatients = async () => {
   try {
-    loading.value = true;
     const response = await PatientService.getPatients();
     patients.value = response.data;
     console.log('Pacientes cargados:', patients.value.length);
@@ -68,18 +68,23 @@ const handleCloseModal = () => {
 };
 
 const handleFormSubmit = async (formData) => {
+  console.log('Guardando paciente...', formData);
+
   try {
-    if (editingPatient.value) {
-      await PatientService.updatePatient(editingPatient.value.id, formData);
-    } else {
-      await PatientService.createPatient(formData);
-    }
+    console.log('Recargando lista de pacientes...');
     await fetchPatients();
-    setTimeout(() => {
-      handleCloseModal();
-    }, 500);
+    console.log('Lista actualizada');
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    if (modalRef.value) {
+      modalRef.value.closeAfterSuccess();
+    }
+
+    handleCloseModal();
+
   } catch (error) {
-    console.error('Error al guardar paciente:', error);
+    console.error('Error al actualizar lista:', error);
   }
 };
 
@@ -97,17 +102,19 @@ const handleDelete = async (patientId) => {
     deletePatientId.value = null;
   } catch (error) {
     console.error('Error al eliminar paciente:', error);
+  } finally {
+    isDeleting.value = false;
   }
 };
 
-onMounted(() => {
-  fetchPatients();
+onMounted(async () => {
+  await fetchPatients();
 });
 </script>
 
 <template>
   <div>
-    <ModalFormPatient :open="showFormModal" :patient="editingPatient" @close="handleCloseModal"
+    <ModalFormPatient ref="modalRef" :open="showFormModal" :patient="editingPatient" @close="handleCloseModal"
       @submit="handleFormSubmit" />
     <div class="p-6 bg-white border border-gray-200 rounded-lg shadow">
       <div class="space-y-6">
@@ -178,6 +185,7 @@ onMounted(() => {
                 <tr v-for="patient in filteredPatients" :key="patient.id" class="hover:bg-gray-50 transition-colors">
                   <td class="px-4 py-4 whitespace-nowrap">
                     <div class="font-medium text-gray-900">{{ patient.name }}</div>
+                    <div class="text-sm text-gray-500">{{ patient.paternal_surname }} {{ patient.maternal_surname }}</div>
                   </td>
                   <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                     {{ calculateAgeForPatient(patient.birth_date) }} años
@@ -189,7 +197,10 @@ onMounted(() => {
                     </span>
                   </td>
                   <td class="px-4 py-4 text-sm text-gray-600">{{ patient.origin_city }}</td>
-                  <td class="px-4 py-4 text-sm text-gray-600">{{ patient.hospital.name }}</td>
+                  <td class="px-4 py-4 text-sm text-gray-600">
+                    <div class="font-medium">{{ patient.hospital?.name}}</div>
+                    <div class="text-xs text-gray-400">{{ patient.hospital?.city }}</div>
+                  </td>
                   <td class="px-4 py-4">
                     <div class="text-sm">
                       <div class="text-gray-500 font-semibold">{{ patient.tutor.name }}</div>

@@ -5,9 +5,18 @@ import PatientTable from './components/PatientTable.vue';
 import { Plus } from 'lucide-vue-next';
 
 const showFormModal = ref(false);
+const refreshTrigger = ref(0);
 
 const handleOpenFormModal = () => {
   showFormModal.value = true;
+};
+
+const handleModalClose = (shouldRefresh = false) => {
+  showFormModal.value = false;
+  
+  if (shouldRefresh) {
+    refreshTrigger.value++;
+  }
 };
 
 </script>
@@ -27,7 +36,11 @@ const handleOpenFormModal = () => {
         </button>
       </div>
 
-      <PatientTable :showModal="showFormModal" @close-modal="showFormModal = false" />
+      <PatientTable 
+      :showModal="showFormModal" 
+      :refreshTrigger="refreshTrigger" 
+      @close-modal="handleModalClose" 
+      />
     </main>
   </div>
 </template>
