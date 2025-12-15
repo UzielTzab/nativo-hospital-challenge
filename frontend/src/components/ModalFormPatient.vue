@@ -75,6 +75,10 @@ watch(
   }
 );
 
+const maxDate = computed(() => {
+  return new Date().toISOString().split('T')[0];
+});
+
 const resetForm = () => {
   formData.value = {
     name: '',
@@ -224,9 +228,14 @@ const handleClose = () => {
 
           <div class="space-y-2">
             <label class="text-sm font-bold text-gray-700">Fecha de Nacimiento*</label>
-            <input v-model="formData.birth_date" type="date"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            <input 
+              v-model="formData.birth_date" 
+              type="date"
+              :max="maxDate"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100"
+              :disabled="submitting"
               required />
+            <p class="text-xs text-gray-500">No se permiten fechas futuras</p>
           </div>
 
           <div class="space-y-2">

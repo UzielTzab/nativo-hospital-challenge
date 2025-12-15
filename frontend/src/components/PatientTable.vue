@@ -4,6 +4,7 @@ import { Edit, Trash2, FileDown, Search, Filter, LoaderCircle } from 'lucide-vue
 import ModalFormPatient from './ModalFormPatient.vue';
 import PatientService from '../services/PatientService';
 import { calculateAge } from '../utils/ageCalculator';
+import { generatePatientPDF } from '../utils/pdfGenerator';
 
 const props = defineProps({
   showModal: {
@@ -29,10 +30,13 @@ watch(() => props.showModal, (newValue) => {
 
 const filteredPatients = computed(() => {
   return patients.value.filter((patient) => {
+    const searchLower = searchTerm.value.toLowerCase();
     const matchesSearch =
-      patient.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-      patient.hospital.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-      patient.origin_city.toLowerCase().includes(searchTerm.value.toLowerCase());
+      patient.name.toLowerCase().includes(searchLower) ||
+      patient.paternal_surname.toLowerCase().includes(searchLower) ||
+      patient.maternal_surname.toLowerCase().includes(searchLower) ||
+      patient.hospital.name.toLowerCase().includes(searchLower) ||
+      patient.origin_city.toLowerCase().includes(searchLower);
 
     const matchesSexo = filterSexo.value === 'all' || patient.sex === filterSexo.value;
 
@@ -44,10 +48,14 @@ const calculateAgeForPatient = (birthDate) => {
   return calculateAge(birthDate);
 };
 
-const handleDownloadPatientData = (id) => {
-  alert(`Descargando datos del paciente con ID: ${id}`);
+const handleDownloadPatientData = (patient) => {
+  try {
+    generatePatientPDF(patient);
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+    alert('Error al generar el PDF. Por favor intenta de nuevo.');
+  }
 };
-
 
 const fetchPatients = async () => {
   try {
@@ -210,15 +218,18 @@ onMounted(async () => {
                   <td class="px-4 py-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center gap-2">
                       <button @click="handleEditPatient(patient)"
-                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
+                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                        title="Editar paciente">
                         <Edit class="h-4 w-4 text-blue-600" />
                       </button>
-                      <button @click="handleDownloadPatientData(patient.id)"
-                        class="h-8 w-8 inline-flex items-center justify-center text-blue-600 hover:bg-blue-200 rounded-lg transition-colors">
+                      <button @click="handleDownloadPatientData(patient)"
+                        class="h-8 w-8 inline-flex items-center justify-center text-green-600 hover:bg-blue-100 rounded-lg transition-colors"
+                        title="Descargar ficha en PDF">
                         <FileDown class="h-4 w-4 text-blue-600" />
                       </button>
                       <button @click="deletePatientId = patient.id"
-                        class="h-8 w-8 inline-flex bg-red-100 items-center justify-center text-red-600 hover:bg-red-200 rounded-lg transition-colors">
+                        class="h-8 w-8 inline-flex bg-red-100 items-center justify-center text-red-600 hover:bg-red-200 rounded-lg transition-colors"
+                        title="Eliminar paciente">
                         <Trash2 class="h-4 w-4 text-red-600" />
                       </button>
 
