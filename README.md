@@ -47,7 +47,7 @@ docker-compose exec backend php artisan db:seed --class=PatientSeeder
 
 # 10. Instalar dependencias del frontend
 docker exec -it app_frontend npm install
-
+```
 
 **Acceso:**
 - Frontend: http://localhost:5173
