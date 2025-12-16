@@ -52,8 +52,7 @@ docker exec -it app_frontend npm install
 
 **Acceso:**
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:8001/api
-- Base de datos: `localhost:3306` (usuario: `root`, password: `root`)
+- Backend API: http://localhost:8001
 
 ---
 
