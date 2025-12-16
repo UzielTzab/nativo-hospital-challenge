@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             HospitalSeeder::class,
             TutorSeeder::class,
+            PatientSeeder::class,
         ]);
 
         // User::factory()->create([

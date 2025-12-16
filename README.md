@@ -42,12 +42,13 @@ docker-compose up -d
 # 8. Ejecutar migraciones y seeders
 docker-compose exec backend php artisan migrate:fresh --seed
 
-# 9. Instalar dependencias del frontend
+# 9. Ejecutar seeders de pacientes
+
+docker-compose exec backend php artisan db:seed --class=PatientSeeder
+
+# 10. Instalar dependencias del frontend
 docker exec -it app_frontend npm install
 
-# 10. Verificar que funciona
-curl http://localhost:8001/api/patients
-```
 
 **Acceso:**
 - Frontend: http://localhost:5173
