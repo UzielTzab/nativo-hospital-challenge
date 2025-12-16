@@ -43,7 +43,6 @@ docker-compose up -d
 docker-compose exec backend php artisan migrate:fresh --seed
 
 # 9. Ejecutar seeders de pacientes
-
 docker-compose exec backend php artisan db:seed --class=PatientSeeder
 
 # 10. Instalar dependencias del frontend
