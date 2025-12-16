@@ -51,7 +51,11 @@ docker exec -it app_frontend npm install
 
 **Acceso:**
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:8001
+- Backend API: http://l ocalhost:8001
 
 ---
+
+##   Diagrama de Base de Datos
+
+[![Diagrama de Base de Datos](./bd_image/bd_normalizada.png)](./bd_image/bd_diagram.png)
 
