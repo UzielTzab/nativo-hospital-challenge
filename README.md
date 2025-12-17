@@ -2,7 +2,7 @@
 
 Sistema de registro de pacientes construida con Laravel + Vue.js
 
-**Stack Tecnológico:** Laravel 11 · Vue 3 · MySQL 8.0 · Docker · Vite
+**Stack Tecnológico:** Laravel 12 · Vue 3 · MySQL 8.0 · Docker · Vite
 
 ---
 
@@ -52,4 +52,5 @@ docker exec -it app_frontend npm install
 ##   Diagrama de Base de Datos
 
 [![Diagrama de Base de Datos](./bd_image/bd_normalizada.png)](./bd_image/bd_diagram.png)
+
 
