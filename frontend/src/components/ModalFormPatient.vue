@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue';
 import { X, LoaderCircle, CheckCircle, AlertCircle, Search } from 'lucide-vue-next';
 import PatientService from '../services/PatientService';
 import TutorService from '../services/TutorService';
+import HospitalService from '../services/HospitalService';
 
 const hospitals = ref([]);
 const tutors = ref([]);
@@ -115,7 +116,7 @@ const fetchCatalogs = async () => {
   try {
     loadingData.value = true;
     const [hResponse, tResponse] = await Promise.all([
-      PatientService.getHospitals(),
+      HospitalService.getHospitals(),
       TutorService.getTutors()
     ]);
     hospitals.value = hResponse.data;

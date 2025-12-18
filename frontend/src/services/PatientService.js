@@ -23,12 +23,4 @@ export default {
     deletePatient(id) {
         return axios.delete(`${API_URL}/patients/${id}`);
     },
-
-    getHospitals() {
-        return axios.get(`${API_URL}/hospitals`);
-    },
-
-    getTutors() {
-        return axios.get(`${API_URL}/tutors`);
-    }
 };
