@@ -14,7 +14,17 @@ Sistema de registro de pacientes construido con Laravel + Vue.js
 
 ---
 
-##   Instalación Rápida
+##   Instalación Rápida (Automática)
+
+```bash
+git clone https://github.com/UzielTzab/nativo-hospital-challenge.git
+
+cd nativo-hospital-challenge
+
+bash setup.sh
+```
+
+##   Instalación Detallada
 
 ```bash
 # 1. Clonar repositorio
