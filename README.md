@@ -1,12 +1,12 @@
 ﻿# Nativo Hospital Challenge
 
-Sistema de registro de pacientes construida con Laravel + Vue.js
+Sistema de registro de pacientes construido con Laravel + Vue.js
 
 **Stack Tecnológico:** Laravel 12 · Vue 3 · MySQL 8.0 · Docker · Vite
 
 ---
 
-##  Requisitos Previos
+##   Requisitos Previos
 
 - **Docker Desktop** (versión 20.10+)
 - **Git**
@@ -18,7 +18,7 @@ Sistema de registro de pacientes construida con Laravel + Vue.js
 
 ```bash
 # 1. Clonar repositorio
-git clone https://github.com/UzielTzab/nativo-hospital-challenge.git
+git clone [https://github.com/UzielTzab/nativo-hospital-challenge.git](https://github.com/UzielTzab/nativo-hospital-challenge.git)
 cd nativo-hospital-challenge
 
 # 2. Copiar archivo de entorno
@@ -27,7 +27,7 @@ cp backend/.env.example backend/.env
 # 3. Construir imágenes
 docker-compose build
 
-# 4. Instalar dependencias del backend (antes de levantar el servicio)
+# 4. Instalar dependencias del backend
 docker-compose run --rm backend composer install
 
 # 5. Generar clave de aplicación
@@ -40,12 +40,14 @@ docker-compose up -d
 docker-compose exec backend php artisan migrate:fresh --seed
 
 # 8. Instalar dependencias del frontend
-docker exec -it app_frontend npm install
+docker-compose exec frontend npm install
 ```
 
 **Acceso:**
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:8001
+
+- Base de datos: localhost:3307
 
 ---
 
